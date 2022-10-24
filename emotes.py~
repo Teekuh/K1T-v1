@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#--- Define image series -----------------------------------------------
+
+
+sequence_list = [	'IDLE', 'AIRHORN', 'BLINK', 'BLUSH', 'EMO', 'EVIL', 
+						'EVILLOL', 'FIRE', 'HAPPY', 'HEADBANG', 'HEHE', 
+						'LISTEN', 'LOVE', 'NOTE', 'OLD1', 'OLD2', 'OLD3', 
+						'POMMES', 'SING1', 'SING2', 'SING3', 'SING4', 'SING5', 
+						'SURPRISED', 'VILLAIN', 'WINK' ]
+
+

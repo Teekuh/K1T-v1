@@ -1,0 +1,18 @@
+#!/bin/bash
+
+usbDevs=$(lsusb | wc -l)
+while true; do
+
+	oldDevs=$usbDevs
+	usbDevs=$(lsusb | wc -l)
+
+#	echo $usbDevs $oldDevs
+
+	if [[ $usbDevs > $oldDevs ]]; then
+		echo 69 > current_value.txt
+	fi
+
+	sleep 0.01
+
+done
+

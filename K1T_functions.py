@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import pygame.display
+import pygame.font
+import pygame.time
+import pygame.draw
+import pygame.event
+import pygame.surface
+import subprocess
+from songlist import *
+from initalize import *
+
+#--- Animation-Loops ---------------------------------------------------
+def animate(screen, animation, frame):
+	screen.blit(animation_list[str(animation)][frame],(0,0))
+#--- Length of bar in ms -----------------------------------------------
+def getLengthOfBar(bpm):
+	step = (60000 // bpm ) // 4
+	return step
+#--- Play a song--------------------------------------------------------
+def playSong(currentValue):
+	song = song_list[str(currentValue)]()
+	return song
+#--- Detect whether a new USB-device has been plugged in----------------
+def detect_usb(): 
+	lsusb	= subprocess.Popen(["lsusb"],stdout=subprocess.PIPE)
+	devUSB = subprocess.Popen(['wc', '-l'],stdin=lsusb.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	lsusb.stdout.close()
+	numUSB = devUSB.stdout.read()
+	devUSB = [int(i) for i in numUSB.split() if i.isdigit()][0]
+
+	return devUSB
+#--- Reset all scripts -------------------------------------------------
+def reset_K1T():
+	subprocess.call(PATH + "reset.sh", shell=True)
+
+try:
+	resetbutton.when_pressed = reset_K1T
+	pause()
+	
+finally:
+	pass	
+
+#--- Play animations of a song------------------------------------------
+def animate_song(screen, song, songOld, currentAnimationIndex, startTime):
+					
+	bpm 		= song[0]
+	sequence = song[1]
+	songTime = song[2]
+	
+	if song != songOld:	
+		currentAnimationIndex = 0
+		currentAnimationFrame = 0
+		startTime = pygame.time.get_ticks()
+		note = open( PATH + "current_value.txt", "w" )
+		note.truncate()
+
+	songOld = song
+	timePassed = pygame.time.get_ticks() - startTime	
+	currentAnimationFrame = timePassed // getLengthOfBar(bpm)
+	
+	
+	print(song,songOld,sequence, currentAnimationIndex, len(songTime), currentAnimationFrame, songTime[currentAnimationIndex])	
+	
+	currentAnimation = sequence[currentAnimationIndex]
+	
+	if currentAnimationFrame <= songTime[currentAnimationIndex]:
+		animate(screen, currentAnimation, currentAnimationFrame)
+	
+
+	if(currentAnimationIndex < len(songTime) and currentAnimationFrame >= songTime[currentAnimationIndex]):
+		currentAnimationIndex += 1
+		startTime = pygame.time.get_ticks()
+
+	if(currentAnimationIndex >= len(song[1])):
+		song = Idle()
+		currentAnimationIndex = 0
+		startTime = pygame.time.get_ticks()
+			
+	clock.tick(FPS)
+
+	pygame.display.flip()
+	pygame.display.set_caption("K1T [{} fps]".format(int(clock.get_fps())))
+	
+	return (song, songOld, currentAnimationIndex, startTime)	
